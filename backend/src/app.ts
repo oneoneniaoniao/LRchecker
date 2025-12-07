@@ -5,7 +5,7 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import wordRoutes from "@/route/wordRoutes";
-// import scoreRoutes from "@/route/scoreRoutes"; // TODO: スコア保存機能は後で追加
+import scoreRoutes from "@/route/scoreRoutes";
 
 const app = express();
 
@@ -21,7 +21,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use("/word", wordRoutes);
-// app.use("/score", scoreRoutes); // TODO: スコア保存機能は後で追加
+app.use("/score", scoreRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ message: "Not Found" });

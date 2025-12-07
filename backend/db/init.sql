@@ -23,13 +23,14 @@ VALUES
   ('claw', 'audio/alayna/claw.mp3', 'craw', 'audio/alayna/craw.mp3'),
   ('load', 'audio/alayna/load.mp3', 'road', 'audio/alayna/road.mp3');
 
--- -- スコアテーブル
--- CREATE TABLE IF NOT EXISTS scores (
---   id SERIAL PRIMARY KEY,
---   score INTEGER NOT NULL,
---   created_at TIMESTAMP DEFAULT now()
--- );
+-- スコアテーブル
+CREATE TABLE IF NOT EXISTS scores (
+  id SERIAL PRIMARY KEY,
+  player_name TEXT NOT NULL,
+  score INTEGER NOT NULL,
+  created_at TIMESTAMP DEFAULT now()
+);
 
--- -- インデックスを作成（ランキング取得を高速化）
--- CREATE INDEX IF NOT EXISTS idx_scores_score ON scores(score DESC);
--- CREATE INDEX IF NOT EXISTS idx_scores_created_at ON scores(created_at DESC);
+-- インデックスを作成（ランキング取得を高速化）
+CREATE INDEX IF NOT EXISTS idx_scores_score ON scores(score DESC);
+CREATE INDEX IF NOT EXISTS idx_scores_created_at ON scores(created_at DESC);

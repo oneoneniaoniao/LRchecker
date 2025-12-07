@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@/components/ui/button/Button";
+import Ranking, { RankingScore } from "@/components/Ranking";
+import { saveScore, fetchTopScores } from "@/services/api";
 
 type GameOverProps = {
   score: number;
@@ -7,9 +9,50 @@ type GameOverProps = {
 };
 
 const GameOver: React.FC<GameOverProps> = ({ score, onRestart }) => {
+  const [playerName, setPlayerName] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [ranking, setRanking] = useState<RankingScore[]>([]);
+  const [isLoadingRanking, setIsLoadingRanking] = useState(true);
+
+  // ランキングを読み込む
+  useEffect(() => {
+    const loadRanking = async () => {
+      setIsLoadingRanking(true);
+      const scores = await fetchTopScores(10);
+      setRanking(scores);
+      setIsLoadingRanking(false);
+    };
+    loadRanking();
+  }, []);
+
+  // スコアが保存された後にランキングを再読み込み
+  useEffect(() => {
+    if (isSubmitted) {
+      const loadRanking = async () => {
+        const scores = await fetchTopScores(10);
+        setRanking(scores);
+      };
+      loadRanking();
+    }
+  }, [isSubmitted]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!playerName.trim()) return;
+
+    setIsSubmitting(true);
+    const saved = await saveScore(playerName.trim(), score);
+    setIsSubmitting(false);
+
+    if (saved) {
+      setIsSubmitted(true);
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto space-y-8 py-8 min-h-screen">
-      <div className="text-center space-y-6 animate-fade-in">
+    <div className="flex flex-col items-center justify-center w-full max-w-6xl mx-auto space-y-8 py-8 min-h-screen px-4">
+      <div className="text-center space-y-6 animate-fade-in w-full">
         <h1 className="text-6xl font-bold text-red-600 mb-4">Game Over</h1>
         <div className="space-y-4">
           <p className="text-2xl text-gray-700 dark:text-gray-300">
@@ -19,10 +62,60 @@ const GameOver: React.FC<GameOverProps> = ({ score, onRestart }) => {
             {score}
           </div>
         </div>
-        <div className="pt-8">
-          <Button buttonText="Once Again!?" onClick={onRestart} />
-        </div>
+
+        {!isSubmitted && score > 0 && (
+          <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+            <div className="flex flex-col items-center space-y-4">
+              <input
+                type="text"
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                placeholder="Enter your name (max 20 characters)"
+                maxLength={20}
+                className="px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 w-full max-w-md"
+                disabled={isSubmitting}
+              />
+              <button
+                type="submit"
+                disabled={!playerName.trim() || isSubmitting}
+                className={`bg-blue-500 text-white font-semibold px-8 py-4 rounded-xl shadow-lg transform transition-all duration-200 min-w-[200px] text-2xl ${
+                  !playerName.trim() || isSubmitting
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-blue-600 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+                }`}
+              >
+                {isSubmitting ? "Submitting..." : "Save Score"}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {isSubmitted && (
+          <div className="pt-4">
+            <p className="text-green-600 text-xl font-semibold mb-4">
+              Score saved!
+            </p>
+            <Button buttonText="Try Again" onClick={onRestart} />
+          </div>
+        )}
+
+        {!isSubmitted && score > 0 && (
+          <div className="pt-4">
+            <Button buttonText="Skip" onClick={onRestart} />
+          </div>
+        )}
+        {!isSubmitted && score === 0 && (
+          <div className="pt-4">
+            <Button buttonText="Try Again" onClick={onRestart} />
+          </div>
+        )}
       </div>
+
+      {!isLoadingRanking && (
+        <div className="w-full flex justify-center">
+          <Ranking scores={ranking} />
+        </div>
+      )}
     </div>
   );
 };

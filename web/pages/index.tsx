@@ -13,7 +13,7 @@ const Home: React.FC = () => {
   const [result, setResult] = useState("");
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
-  const [lives, setLives] = useState(3);
+  const [lives, setLives] = useState(1);
   const [isGameOver, setIsGameOver] = useState(false);
 
   const loadNewQuestion = async () => {
