@@ -1,7 +1,10 @@
 # Dockerfile
-FROM golang:1.22-alpine
+FROM golang:1.23-alpine
 
 WORKDIR /app
+
+# airをインストール（ホットリロード用）
+RUN go install github.com/air-verse/air@v1.61.5
 
 # 依存関係をコピーしてインストール
 COPY go.mod go.sum* ./
@@ -10,14 +13,8 @@ RUN go mod download
 # ソースコードをコピー
 COPY . .
 
-# アプリケーションをビルド
-RUN go build -o main .
-
-# 静的ファイルをコピー
-COPY audio ./audio
-
 # ポートを公開
 EXPOSE 5001
 
-# アプリケーションを実行
-CMD ["./main"]
+# 開発モードで実行（airを使用）
+CMD ["air", "-c", ".air.toml"]
