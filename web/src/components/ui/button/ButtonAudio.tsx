@@ -2,18 +2,27 @@ import React from "react";
 
 type AudioButtonProps = {
   audioSrc: string;
+  disabled?: boolean;
 };
 
-const ButtonAudio: React.FC<AudioButtonProps> = ({ audioSrc }) => {
+const ButtonAudio: React.FC<AudioButtonProps> = ({ audioSrc, disabled = false }) => {
   const handleClick = () => {
+    if (disabled || !audioSrc) return;
     const audio = new Audio(audioSrc);
-    audio.play();
+    audio.play().catch((error) => {
+      console.error("音声の再生に失敗しました:", error);
+    });
   };
 
   return (
     <button
       onClick={handleClick}
-      className="bg-purple-500 hover:bg-purple-600 text-white font-bold px-10 py-5 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-200 text-xl flex items-center justify-center gap-2"
+      disabled={disabled}
+      className={`bg-purple-500 text-white font-bold px-10 py-5 rounded-full shadow-xl transform transition-all duration-200 text-xl flex items-center justify-center gap-2 ${
+        disabled
+          ? "opacity-50 cursor-not-allowed"
+          : "hover:bg-purple-600 hover:shadow-2xl hover:scale-110 cursor-pointer"
+      }`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
