@@ -1,4 +1,3 @@
-// pages/_app.tsx
 import type { AppProps } from "next/app";
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
@@ -10,13 +9,11 @@ const inter = Inter({ subsets: ["latin"] });
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <div
-      className={`${inter.className} bg-white text-gray-900 flex flex-col min-h-screen`}
+      className={`${inter.className} bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-900 flex flex-col min-h-screen`}
     >
-      <Header />
-      <main className="flex-grow flex flex-col items-center justify-center p-8">
+      <main className="flex-grow flex flex-col items-center justify-center p-4 sm:p-8">
         <Component {...pageProps} />
       </main>
-      <Footer />
     </div>
   );
 }

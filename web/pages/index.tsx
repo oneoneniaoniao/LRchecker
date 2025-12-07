@@ -30,27 +30,43 @@ const Home: React.FC = () => {
   const handleWordClick = (word: string) => {
     if (word === selectedWord) {
       console.log("GOOD");
-      setResult("⭕️ 正解！");
+      setResult("correct!");
     } else {
       console.log("noooo");
-      setResult("❌ 間違い");
+      setResult("wrong");
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <ButtonAudio audioSrc={currentAudio} />
-      <div className="flex mt-4">
-        <Button
-          buttonText={words[randomIndex][0]}
-          onClick={() => handleWordClick(words[randomIndex][0])}
-        />
-        <Button
-          buttonText={words[randomIndex][1]}
-          onClick={() => handleWordClick(words[randomIndex][1])}
-        />
+    <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto space-y-8 py-8">
+      <div className="flex justify-center">
+        <ButtonAudio audioSrc={currentAudio} />
       </div>
-      <div className="mt-4 text-2xl">{result}</div>
+
+      <div className="w-full space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <Button
+            buttonText={words[randomIndex][0]}
+            onClick={() => handleWordClick(words[randomIndex][0])}
+          />
+          <Button
+            buttonText={words[randomIndex][1]}
+            onClick={() => handleWordClick(words[randomIndex][1])}
+          />
+        </div>
+      </div>
+
+      <div className="h-16 flex items-center justify-center">
+        {result && (
+          <div
+            className={`text-4xl font-bold transition-all duration-300 ${
+              result === "correct!" ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {result}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
