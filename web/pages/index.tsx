@@ -3,13 +3,12 @@ import ButtonAudio from "@/components/ui/button/ButtonAudio";
 import Button from "@/components/ui/button/Button";
 import GameOver from "@/components/GameOver";
 import GameInfo from "@/components/GameInfo";
-import { words } from "@/store/words";
+import { fetchRandomWord, WordDTO } from "@/services/api";
 
-const getRandomIndex = (length: number) => Math.floor(Math.random() * length);
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
 const Home: React.FC = () => {
-  const [randomIndex, setRandomIndex] = useState(0);
-  const [selectedWord, setSelectedWord] = useState("");
+  const [currentQuestion, setCurrentQuestion] = useState<WordDTO | null>(null);
   const [currentAudio, setCurrentAudio] = useState("");
   const [result, setResult] = useState("");
   const [isAnswered, setIsAnswered] = useState(false);
@@ -17,16 +16,13 @@ const Home: React.FC = () => {
   const [lives, setLives] = useState(3);
   const [isGameOver, setIsGameOver] = useState(false);
 
-  const loadNewQuestion = () => {
-    const index = getRandomIndex(words.length);
-    setRandomIndex(index);
-
-    const randomWordIndex = Math.floor(Math.random() * 2);
-    const word = words[index][randomWordIndex];
-    setSelectedWord(word);
-    setResult("");
-    setIsAnswered(false);
-    console.log("selected word is " + word);
+  const loadNewQuestion = async () => {
+    const question = await fetchRandomWord();
+    if (question) {
+      setCurrentQuestion(question);
+      setResult("");
+      setIsAnswered(false);
+    }
   };
 
   const restartGame = () => {
@@ -43,10 +39,10 @@ const Home: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedWord) {
-      setCurrentAudio(`http://localhost:5001/audio/${selectedWord}.mp3`);
+    if (currentQuestion) {
+      setCurrentAudio(`${API_URL}/${currentQuestion.audioUrl}`);
     }
-  }, [selectedWord]);
+  }, [currentQuestion]);
 
   useEffect(() => {
     if (currentAudio && !isAnswered) {
@@ -73,16 +69,14 @@ const Home: React.FC = () => {
     }
   }, [result, isGameOver]);
 
-  const handleWordClick = (word: string) => {
-    if (isAnswered || isGameOver) return; // 既に回答済みまたはゲームオーバーの場合は何もしない
+  const handleWordClick = (wordIndex: number) => {
+    if (isAnswered || isGameOver || !currentQuestion) return;
 
     setIsAnswered(true);
-    if (word === selectedWord) {
-      console.log("GOOD");
+    if (wordIndex === currentQuestion.correctIndex) {
       setResult("correct!");
       setScore((prev) => prev + 1);
     } else {
-      console.log("noooo");
       setResult("wrong");
       const newLives = lives - 1;
       setLives(newLives);
@@ -105,18 +99,20 @@ const Home: React.FC = () => {
       </div>
 
       <div className="w-full space-y-4">
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button
-            buttonText={words[randomIndex][0]}
-            onClick={() => handleWordClick(words[randomIndex][0])}
-            disabled={isAnswered}
-          />
-          <Button
-            buttonText={words[randomIndex][1]}
-            onClick={() => handleWordClick(words[randomIndex][1])}
-            disabled={isAnswered}
-          />
-        </div>
+        {currentQuestion && (
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button
+              buttonText={currentQuestion.words[0]}
+              onClick={() => handleWordClick(0)}
+              disabled={isAnswered}
+            />
+            <Button
+              buttonText={currentQuestion.words[1]}
+              onClick={() => handleWordClick(1)}
+              disabled={isAnswered}
+            />
+          </div>
+        )}
       </div>
 
       <div className="h-16 flex items-center justify-center">

@@ -1,19 +1,50 @@
 services:
+  db:
+    image: postgres:15
+    container_name: lrchecker-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-lrchecker}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
+    container_name: lrchecker-backend
     volumes:
-      - ./backend:/app
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+      - ./backend/audio:/usr/src/app/audio
     ports:
       - "5001:5001"
     environment:
       PORT: 5001
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASS: ${POSTGRES_PASSWORD:-postgres}
+      DB_NAME: ${POSTGRES_DB:-lrchecker}
+      FRONTEND_URL: http://localhost:3000
+    depends_on:
+      db:
+        condition: service_healthy
 
   web:
     build:
       context: ./web
       dockerfile: Dockerfile
+    container_name: lrchecker-web
     volumes:
       - ./web:/app
       - /app/node_modules
@@ -23,3 +54,6 @@ services:
       NEXT_PUBLIC_API_URL: http://localhost:5001
     depends_on:
       - backend
+
+volumes:
+  db-data:
