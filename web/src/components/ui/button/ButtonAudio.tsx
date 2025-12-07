@@ -5,7 +5,10 @@ type AudioButtonProps = {
   disabled?: boolean;
 };
 
-const ButtonAudio: React.FC<AudioButtonProps> = ({ audioSrc, disabled = false }) => {
+const ButtonAudio: React.FC<AudioButtonProps> = ({
+  audioSrc,
+  disabled = false,
+}) => {
   const handleClick = () => {
     if (disabled || !audioSrc) return;
     const audio = new Audio(audioSrc);
@@ -18,7 +21,7 @@ const ButtonAudio: React.FC<AudioButtonProps> = ({ audioSrc, disabled = false })
     <button
       onClick={handleClick}
       disabled={disabled}
-      className={`bg-purple-500 text-white font-bold px-10 py-5 rounded-full shadow-xl transform transition-all duration-200 text-xl flex items-center justify-center gap-2 ${
+      className={`bg-purple-500 text-white font-bold p-6 rounded-full shadow-xl transform transition-all duration-200 flex items-center justify-center ${
         disabled
           ? "opacity-50 cursor-not-allowed"
           : "hover:bg-purple-600 hover:shadow-2xl hover:scale-110 cursor-pointer"
@@ -26,25 +29,19 @@ const ButtonAudio: React.FC<AudioButtonProps> = ({ audioSrc, disabled = false })
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6"
+        className="h-12 w-12"
         fill="none"
         viewBox="0 0 24 24"
-        stroke="currentColor"
       >
         <path
-          strokeLinecap="round"
+          d="M9.5 6.5C9.5 6.2 9.7 6 10 6L18.5 12L10 18C9.7 18 9.5 17.8 9.5 17.5V6.5Z"
+          fill="currentColor"
+          stroke="currentColor"
+          strokeWidth="2.5"
           strokeLinejoin="round"
-          strokeWidth={2}
-          d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-        />
-        <path
           strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
-      Play Audio
     </button>
   );
 };
