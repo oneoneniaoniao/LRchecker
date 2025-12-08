@@ -7,6 +7,8 @@ import { fetchRandomWord, WordDTO } from "@/services/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
+const HIGH_SCORE_KEY = "lrchecker_high_score";
+
 const Home: React.FC = () => {
   const [currentQuestion, setCurrentQuestion] = useState<WordDTO | null>(null);
   const [currentAudio, setCurrentAudio] = useState("");
@@ -15,6 +17,7 @@ const Home: React.FC = () => {
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(1);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [highScore, setHighScore] = useState(0);
 
   const loadNewQuestion = async () => {
     const question = await fetchRandomWord();
@@ -33,6 +36,16 @@ const Home: React.FC = () => {
     setIsAnswered(false);
     loadNewQuestion();
   };
+
+  // ハイスコアをlocalStorageから読み込む
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedHighScore = localStorage.getItem(HIGH_SCORE_KEY);
+      if (savedHighScore) {
+        setHighScore(parseInt(savedHighScore, 10));
+      }
+    }
+  }, []);
 
   useEffect(() => {
     loadNewQuestion();
@@ -69,6 +82,15 @@ const Home: React.FC = () => {
     }
   }, [result, isGameOver]);
 
+  // ゲーム終了時にハイスコアを更新
+  useEffect(() => {
+    if (isGameOver && typeof window !== "undefined" && score > highScore) {
+      const newHighScore = score;
+      setHighScore(newHighScore);
+      localStorage.setItem(HIGH_SCORE_KEY, newHighScore.toString());
+    }
+  }, [isGameOver, score, highScore]);
+
   const handleWordClick = (wordIndex: number) => {
     if (isAnswered || isGameOver || !currentQuestion) return;
 
@@ -92,7 +114,7 @@ const Home: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto space-y-20 py-8">
-      <GameInfo score={score} lives={lives} />
+      <GameInfo score={score} lives={lives} highScore={highScore} />
 
       <div className="flex justify-center">
         <ButtonAudio audioSrc={currentAudio} disabled={isAnswered} />
