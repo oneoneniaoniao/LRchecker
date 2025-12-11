@@ -5,6 +5,7 @@ COPY package*.json ./
 RUN npm ci
 COPY ./src ./src
 COPY ./tsconfig.json ./
+COPY ./audio ./audio
 RUN npm run build
 
 FROM node:18-alpine
