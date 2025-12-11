@@ -11,9 +11,9 @@ FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
-# 本番用の依存関係のみをインストール
+# 本番用の依存関係のみをインストール（スクリプトを無視）
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --only=production --ignore-scripts && npm cache clean --force
 
 # ビルド済みファイルと必要なファイルをコピー
 COPY --from=builder /usr/src/app/dist ./dist
