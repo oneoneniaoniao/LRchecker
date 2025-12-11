@@ -2,7 +2,7 @@ FROM node:18-alpine AS builder
 
 WORKDIR /usr/src/app
 COPY package*.json ./
-RUN npm ci --only=production=false
+RUN npm ci
 COPY ./src ./src
 COPY ./tsconfig.json ./
 RUN npm run build
