@@ -4,6 +4,7 @@ import Button from "@/components/ui/button/Button";
 import GameOver from "@/components/GameOver";
 import GameInfo from "@/components/GameInfo";
 import { fetchRandomWord, WordDTO } from "@/services/api";
+import { INITIAL_LIVES } from "@/config/gameConfig";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
@@ -15,7 +16,7 @@ const Home: React.FC = () => {
   const [result, setResult] = useState("");
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
-  const [lives, setLives] = useState(1);
+  const [lives, setLives] = useState(INITIAL_LIVES);
   const [isGameOver, setIsGameOver] = useState(false);
   const [highScore, setHighScore] = useState(0);
 
@@ -30,7 +31,7 @@ const Home: React.FC = () => {
 
   const restartGame = () => {
     setScore(0);
-    setLives(3);
+    setLives(INITIAL_LIVES);
     setIsGameOver(false);
     setResult("");
     setIsAnswered(false);

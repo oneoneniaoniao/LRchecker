@@ -1,4 +1,5 @@
 import React from "react";
+import { INITIAL_LIVES } from "@/config/gameConfig";
 
 type GameInfoProps = {
   score: number;
@@ -7,6 +8,9 @@ type GameInfoProps = {
 };
 
 const GameInfo: React.FC<GameInfoProps> = ({ score, lives, highScore }) => {
+  // ライフ数の配列を生成（1からINITIAL_LIVESまで）
+  const lifeArray = Array.from({ length: INITIAL_LIVES }, (_, i) => i + 1);
+
   return (
     <div className="fixed top-4 left-4 right-4 flex justify-between items-start z-10">
       {/* スコア表示 - 左 */}
@@ -34,7 +38,7 @@ const GameInfo: React.FC<GameInfoProps> = ({ score, lives, highScore }) => {
       {/* ライフ表示 - 右 */}
       <div className="flex items-center gap-2">
         <div className="flex gap-1">
-          {[1, 2, 3].map((life) => (
+          {lifeArray.map((life) => (
             <span
               key={life}
               className={`text-2xl ${
