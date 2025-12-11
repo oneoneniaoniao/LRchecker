@@ -92,11 +92,17 @@ docker-compose up        # 再起動時にinit.sqlが自動実行される
 
 ## 環境変数
 
-### バックエンド
+### 開発環境
 
 `.env` ファイルを作成（オプション、デフォルト値が設定済み）:
 
 ```env
+# データベース設定
+POSTGRES_DB=lrchecker
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+
+# バックエンド設定
 PORT=5001
 DB_HOST=db
 DB_PORT=5432
@@ -104,7 +110,31 @@ DB_USER=postgres
 DB_PASS=postgres
 DB_NAME=lrchecker
 FRONTEND_URL=http://localhost:3000
+
+# フロントエンド設定
+NEXT_PUBLIC_API_URL=http://localhost:5001
 ```
+
+### 本番環境
+
+本番環境では、以下の環境変数を設定してください：
+
+```env
+# データベース設定（強力なパスワードに変更）
+POSTGRES_DB=lrchecker
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_secure_password_here
+
+# バックエンド設定
+BACKEND_PORT=5001
+FRONTEND_URL=https://your-domain.com
+
+# フロントエンド設定
+WEB_PORT=3000
+NEXT_PUBLIC_API_URL=https://api.your-domain.com
+```
+
+**重要**: `.env` ファイルはGitにコミットされません。本番環境では必ず適切な値を設定してください。
 
 ## API エンドポイント
 
@@ -114,5 +144,5 @@ FRONTEND_URL=http://localhost:3000
 
 ### Scores
 
-- `GET /score` - スコアランキングを取得
+- `GET /score/top?count=10` - スコアランキングを取得
 - `POST /score` - スコアを登録

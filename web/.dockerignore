@@ -1,0 +1,17 @@
+node_modules
+.next
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.env
+.env.local
+.git
+.gitignore
+README.md
+.DS_Store
+*.test.ts
+*.test.tsx
+*.test.js
+*.test.jsx
+coverage
+
