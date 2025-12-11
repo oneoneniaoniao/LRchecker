@@ -65,7 +65,7 @@ const GameOver: React.FC<GameOverProps> = ({ score, onRestart }) => {
 
         {!isSubmitted && score > 0 && (
           <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-            <div className="flex flex-col items-center space-y-4">
+            <div className="flex flex-col items-center space-y-8">
               <input
                 type="text"
                 value={playerName}
@@ -100,7 +100,7 @@ const GameOver: React.FC<GameOverProps> = ({ score, onRestart }) => {
         )}
 
         {!isSubmitted && score > 0 && (
-          <div className="pt-4">
+          <div>
             <Button buttonText="Skip" onClick={onRestart} />
           </div>
         )}

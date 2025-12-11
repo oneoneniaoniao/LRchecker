@@ -72,6 +72,14 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     if (result) {
+      // 正解/不正解の音声を再生
+      const soundPath =
+        result === "correct!" ? "/sounds/correct.mp3" : "/sounds/wrong.mp3";
+      const audio = new Audio(soundPath);
+      audio.play().catch((error) => {
+        console.error("結果音声の再生に失敗しました:", error);
+      });
+
       // 結果を表示してから1.5秒後に次の問題に移る
       const timer = setTimeout(() => {
         if (!isGameOver) {
