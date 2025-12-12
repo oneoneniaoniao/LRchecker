@@ -64,27 +64,17 @@
    ```
 5. デプロイ
 
-### 3. データベースに初期データを投入
+### 3. データベースの初期化
 
-Railway Dashboard → PostgreSQL → **Data** → **Query** で以下を実行：
+**自動実行されます！** 🎉
 
-```sql
-INSERT INTO words (word1_text, word1_url, word2_text, word2_url)
-VALUES
-  ('flee', 'audio/flee.mp3', 'free', 'audio/free.mp3'),
-  ('light', 'audio/light.mp3', 'right', 'audio/right.mp3'),
-  ('low', 'audio/low.mp3', 'row', 'audio/row.mp3'),
-  ('glass', 'audio/glass.mp3', 'grass', 'audio/grass.mp3'),
-  ('lack', 'audio/lack.mp3', 'rack','audio/rack.mp3'),
-  ('blue', 'audio/alayna/blue.mp3', 'brew', 'audio/alayna/brew.mp3'),
-  ('clap', 'audio/alayna/clap.mp3', 'crap', 'audio/alayna/crap.mp3'),
-  ('glow', 'audio/alayna/glow.mp3', 'grow', 'audio/alayna/grow.mp3'),
-  ('rub', 'audio/alayna/rub.mp3', 'love', 'audio/alayna/love.mp3'),
-  ('lip', 'audio/alayna/lip.mp3', 'rip', 'audio/alayna/rip.mp3'),
-  ('claw', 'audio/alayna/claw.mp3', 'craw', 'audio/alayna/craw.mp3'),
-  ('load', 'audio/alayna/load.mp3', 'road', 'audio/alayna/road.mp3')
-ON CONFLICT DO NOTHING;
-```
+バックエンドが起動すると、`backend/src/config/initDb.ts` が自動的に以下を実行します：
+
+- テーブルの作成
+- インデックスの作成
+- 初期データの投入（13個の単語ペア）
+
+手動でのデータ投入は不要です。
 
 ### 4. バックエンドの環境変数を更新
 
@@ -156,34 +146,15 @@ Railwayのバックエンドサービスで、`FRONTEND_URL` をVercelのURLに�
 
 #### 1-4. データベースの初期化
 
-RailwayのPostgreSQLに接続して、初期データを投入する必要があります。
+**自動実行（推奨）**
 
-**方法1: Railway CLI を使用（推奨）**
+バックエンドが起動すると、`backend/src/config/initDb.ts` が自動的に以下を実行します：
 
-```bash
-# Railway CLIをインストール
-npm i -g @railway/cli
+- テーブルの作成（words, scores）
+- インデックスの作成
+- 初期データの投入（既存データがない場合のみ）
 
-# ログイン
-railway login
-
-# プロジェクトに接続（プロジェクトディレクトリで実行）
-cd /path/to/LRchecker
-railway link
-
-# データベースに接続してSQLを実行
-railway run --service Postgres psql $DATABASE_URL < backend/db/init.sql
-```
-
-**方法2: Railway Dashboard から**
-
-1. PostgreSQLサービスの **"Data"** タブを開く
-2. **"Query"** タブを選択
-3. `backend/db/init.sql` の内容をコピー＆ペーストして実行
-
-**方法3: バックエンド起動時に自動実行（簡単）**
-
-`backend/src/config/initDb.ts` がテーブルを作成してくれますが、データの投入は `backend/db/init.sql` に定義されているので、方法1または方法2を使用してください。
+そのため、**手動でのデータ投入は不要**です。バックエンドをデプロイすれば、自動的にデータベースが初期化されます。
 
 ---
 
