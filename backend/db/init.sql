@@ -21,7 +21,8 @@ VALUES
   ('rub', 'audio/alayna/rub.mp3', 'love', 'audio/alayna/love.mp3'),
   ('lip', 'audio/alayna/lip.mp3', 'rip', 'audio/alayna/rip.mp3'),
   ('claw', 'audio/alayna/claw.mp3', 'craw', 'audio/alayna/craw.mp3'),
-  ('load', 'audio/alayna/load.mp3', 'road', 'audio/alayna/road.mp3');
+  ('load', 'audio/alayna/load.mp3', 'road', 'audio/alayna/road.mp3'),
+  ('clown', 'audio/alayna/clown.mp3', 'crown', 'audio/alayna/crown.mp3');
 
 -- スコアテーブル
 CREATE TABLE IF NOT EXISTS scores (
