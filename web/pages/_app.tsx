@@ -1,8 +1,6 @@
 import type { AppProps } from "next/app";
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
-import Header from "@/components/ui/layout/Header";
-import Footer from "@/components/ui/layout/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
