@@ -19,6 +19,7 @@ const Home: React.FC = () => {
   const [lives, setLives] = useState(INITIAL_LIVES);
   const [isGameOver, setIsGameOver] = useState(false);
   const [highScore, setHighScore] = useState(0);
+  const [audioResetTrigger, setAudioResetTrigger] = useState(0);
 
   const loadNewQuestion = async () => {
     const question = await fetchRandomWord();
@@ -26,6 +27,14 @@ const Home: React.FC = () => {
       setCurrentQuestion(question);
       setResult("");
       setIsAnswered(false);
+      setAudioResetTrigger((prev) => prev + 1); // 再生回数をリセット
+      // ボタンのフォーカスを外す
+      if (typeof window !== "undefined") {
+        const activeElement = document.activeElement as HTMLElement;
+        if (activeElement) {
+          activeElement.blur();
+        }
+      }
     }
   };
 
@@ -81,12 +90,12 @@ const Home: React.FC = () => {
         console.error("結果音声の再生に失敗しました:", error);
       });
 
-      // 結果を表示してから1.5秒後に次の問題に移る
+      // 結果を表示してから.5秒後に次の問題に移る
       const timer = setTimeout(() => {
         if (!isGameOver) {
           loadNewQuestion();
         }
-      }, 1500);
+      }, 500);
       return () => clearTimeout(timer);
     }
   }, [result, isGameOver]);
@@ -104,6 +113,13 @@ const Home: React.FC = () => {
     if (isAnswered || isGameOver || !currentQuestion) return;
 
     setIsAnswered(true);
+    // ボタンのフォーカスを外す
+    if (typeof window !== "undefined") {
+      const activeElement = document.activeElement as HTMLElement;
+      if (activeElement) {
+        activeElement.blur();
+      }
+    }
     if (wordIndex === currentQuestion.correctIndex) {
       setResult("correct!");
       setScore((prev) => prev + 1);
@@ -126,7 +142,12 @@ const Home: React.FC = () => {
       <GameInfo score={score} lives={lives} highScore={highScore} />
 
       <div className="flex justify-center">
-        <ButtonAudio audioSrc={currentAudio} disabled={isAnswered} />
+        <ButtonAudio
+          audioSrc={currentAudio}
+          disabled={isAnswered}
+          maxPlays={2}
+          resetTrigger={audioResetTrigger}
+        />
       </div>
 
       <div className="w-full space-y-4">
