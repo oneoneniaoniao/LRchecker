@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import ButtonAudio from "@/components/ui/button/ButtonAudio";
 import Button from "@/components/ui/button/Button";
-import GameOver from "@/components/GameOver";
 import GameInfo from "@/components/GameInfo";
 import { fetchRandomWord, WordDTO } from "@/services/api";
 import { INITIAL_LIVES } from "@/config/gameConfig";
@@ -11,13 +11,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 const HIGH_SCORE_KEY = "lrchecker_high_score";
 
 const Home: React.FC = () => {
+  const router = useRouter();
   const [currentQuestion, setCurrentQuestion] = useState<WordDTO | null>(null);
   const [currentAudio, setCurrentAudio] = useState("");
   const [result, setResult] = useState("");
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(INITIAL_LIVES);
-  const [isGameOver, setIsGameOver] = useState(false);
   const [highScore, setHighScore] = useState(0);
   const [audioResetTrigger, setAudioResetTrigger] = useState(0);
 
@@ -36,15 +36,6 @@ const Home: React.FC = () => {
         }
       }
     }
-  };
-
-  const restartGame = () => {
-    setScore(0);
-    setLives(INITIAL_LIVES);
-    setIsGameOver(false);
-    setResult("");
-    setIsAnswered(false);
-    loadNewQuestion();
   };
 
   // ハイスコアをlocalStorageから読み込む
@@ -92,25 +83,23 @@ const Home: React.FC = () => {
 
       // 結果を表示してから.5秒後に次の問題に移る
       const timer = setTimeout(() => {
-        if (!isGameOver) {
-          loadNewQuestion();
-        }
+        loadNewQuestion();
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [result, isGameOver]);
+  }, [result]);
 
-  // ゲーム終了時にハイスコアを更新
+  // ハイスコアを更新
   useEffect(() => {
-    if (isGameOver && typeof window !== "undefined" && score > highScore) {
+    if (typeof window !== "undefined" && score > highScore) {
       const newHighScore = score;
       setHighScore(newHighScore);
       localStorage.setItem(HIGH_SCORE_KEY, newHighScore.toString());
     }
-  }, [isGameOver, score, highScore]);
+  }, [score, highScore]);
 
   const handleWordClick = (wordIndex: number) => {
-    if (isAnswered || isGameOver || !currentQuestion) return;
+    if (isAnswered || !currentQuestion) return;
 
     setIsAnswered(true);
     // ボタンのフォーカスを外す
@@ -128,14 +117,16 @@ const Home: React.FC = () => {
       const newLives = lives - 1;
       setLives(newLives);
       if (newLives <= 0) {
-        setIsGameOver(true);
+        // ゲームオーバー時にハイスコアを更新してから遷移
+        if (typeof window !== "undefined" && score > highScore) {
+          const newHighScore = score;
+          localStorage.setItem(HIGH_SCORE_KEY, newHighScore.toString());
+        }
+        // ゲームオーバーページに遷移
+        router.push(`/gameover?score=${score}`);
       }
     }
   };
-
-  if (isGameOver) {
-    return <GameOver score={score} onRestart={restartGame} />;
-  }
 
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto space-y-20 py-8">

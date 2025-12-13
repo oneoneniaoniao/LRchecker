@@ -1,19 +1,26 @@
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import Button from "@/components/ui/button/Button";
 import Ranking, { RankingScore } from "@/components/Ranking";
 import { saveScore, fetchTopScores } from "@/services/api";
 
-type GameOverProps = {
-  score: number;
-  onRestart: () => void;
-};
+const GameOverPage: React.FC = () => {
+  const router = useRouter();
+  const { score: scoreParam } = router.query;
+  const score = scoreParam ? parseInt(scoreParam as string, 10) : 0;
 
-const GameOver: React.FC<GameOverProps> = ({ score, onRestart }) => {
   const [playerName, setPlayerName] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ranking, setRanking] = useState<RankingScore[]>([]);
   const [isLoadingRanking, setIsLoadingRanking] = useState(true);
+
+  // スコアが無効な場合はホームにリダイレクト
+  useEffect(() => {
+    if (router.isReady && (!scoreParam || isNaN(score) || score < 0)) {
+      router.push("/");
+    }
+  }, [router, scoreParam, score]);
 
   // ランキングを読み込む
   useEffect(() => {
@@ -48,6 +55,10 @@ const GameOver: React.FC<GameOverProps> = ({ score, onRestart }) => {
     if (saved) {
       setIsSubmitted(true);
     }
+  };
+
+  const handleRestart = () => {
+    router.push("/");
   };
 
   return (
@@ -95,18 +106,18 @@ const GameOver: React.FC<GameOverProps> = ({ score, onRestart }) => {
             <p className="text-green-600 text-xl font-semibold mb-4">
               Score saved!
             </p>
-            <Button buttonText="Try Again" onClick={onRestart} />
+            <Button buttonText="Try Again" onClick={handleRestart} />
           </div>
         )}
 
         {!isSubmitted && score > 0 && (
           <div>
-            <Button buttonText="Skip" onClick={onRestart} />
+            <Button buttonText="Skip" onClick={handleRestart} />
           </div>
         )}
         {!isSubmitted && score === 0 && (
           <div className="pt-4">
-            <Button buttonText="Try Again" onClick={onRestart} />
+            <Button buttonText="Try Again" onClick={handleRestart} />
           </div>
         )}
       </div>
@@ -120,4 +131,4 @@ const GameOver: React.FC<GameOverProps> = ({ score, onRestart }) => {
   );
 };
 
-export default GameOver;
+export default GameOverPage;
