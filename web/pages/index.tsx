@@ -129,45 +129,46 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto space-y-20 py-8">
+    <>
       <GameInfo score={score} lives={lives} highScore={highScore} />
+      <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto space-y-12 py-4">
+        <div className="flex justify-center -mt-8">
+          <ButtonAudio
+            audioSrc={currentAudio}
+            disabled={isAnswered}
+            maxPlays={2}
+            resetTrigger={audioResetTrigger}
+          />
+        </div>
 
-      <div className="flex justify-center">
-        <ButtonAudio
-          audioSrc={currentAudio}
-          disabled={isAnswered}
-          maxPlays={2}
-          resetTrigger={audioResetTrigger}
-        />
-      </div>
+        <div className="w-full space-y-4">
+          {currentQuestion && (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button
+                buttonText={currentQuestion.words[0]}
+                onClick={() => handleWordClick(0)}
+                disabled={isAnswered}
+              />
+              <Button
+                buttonText={currentQuestion.words[1]}
+                onClick={() => handleWordClick(1)}
+                disabled={isAnswered}
+              />
+            </div>
+          )}
+        </div>
 
-      <div className="w-full space-y-4">
-        {currentQuestion && (
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button
-              buttonText={currentQuestion.words[0]}
-              onClick={() => handleWordClick(0)}
-              disabled={isAnswered}
-            />
-            <Button
-              buttonText={currentQuestion.words[1]}
-              onClick={() => handleWordClick(1)}
-              disabled={isAnswered}
-            />
+        {result && (
+          <div
+            className={`fixed bottom-10 transform z-50 text-4xl font-bold transition-all duration-300 animate-fade-in pointer-events-none ${
+              result === "correct!" ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {result}
           </div>
         )}
       </div>
-
-      {result && (
-        <div
-          className={`fixed bottom-10 transform z-50 text-4xl font-bold transition-all duration-300 animate-fade-in pointer-events-none ${
-            result === "correct!" ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          {result}
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 

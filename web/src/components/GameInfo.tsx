@@ -18,7 +18,7 @@ const GameInfo: React.FC<GameInfoProps> = ({ score, lives, highScore }) => {
         {highScore > 0 && (
           <div className="flex items-center gap-2">
             <span className="text-md font-semibold text-gray-700 dark:text-gray-400">
-              My High Score:
+              My Best Score:
             </span>
             <span className="text-lg font-bold text-purple-600 dark:text-gray-400">
               {highScore}
