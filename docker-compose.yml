@@ -43,7 +43,7 @@ services:
   web:
     build:
       context: ./web
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: lrchecker-web
     volumes:
       - ./web:/app

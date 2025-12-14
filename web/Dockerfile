@@ -2,11 +2,11 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+COPY package*.json package-lock.json ./
+RUN npm ci
 
 COPY . .
-RUN yarn build
+RUN npm run build
 
 FROM node:20-alpine AS runner
 
@@ -15,8 +15,8 @@ WORKDIR /app
 ENV NODE_ENV production
 
 # 本番用の依存関係のみをインストール
-COPY package*.json yarn.lock ./
-RUN yarn install --frozen-lockfile --production && yarn cache clean
+COPY package*.json package-lock.json ./
+RUN npm ci --only=production && npm cache clean --force
 
 # ビルド済みファイルをコピー
 COPY --from=builder /app/.next ./.next
@@ -29,4 +29,4 @@ EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
-CMD ["yarn", "start"]
+CMD ["npm", "run", "start"]
