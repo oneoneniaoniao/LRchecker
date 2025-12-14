@@ -158,17 +158,15 @@ const Home: React.FC = () => {
         )}
       </div>
 
-      <div className="h-16 flex items-center justify-center">
-        {result && (
-          <div
-            className={`text-4xl font-bold transition-all duration-300 animate-fade-in ${
-              result === "correct!" ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {result}
-          </div>
-        )}
-      </div>
+      {result && (
+        <div
+          className={`fixed bottom-10 transform z-50 text-4xl font-bold transition-all duration-300 animate-fade-in pointer-events-none ${
+            result === "correct!" ? "text-green-600" : "text-red-600"
+          }`}
+        >
+          {result}
+        </div>
+      )}
     </div>
   );
 };

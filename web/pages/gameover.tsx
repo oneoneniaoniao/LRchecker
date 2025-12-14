@@ -14,6 +14,7 @@ const GameOverPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ranking, setRanking] = useState<RankingScore[]>([]);
   const [isLoadingRanking, setIsLoadingRanking] = useState(true);
+  const [isInTop10, setIsInTop10] = useState(false);
 
   // スコアが無効な場合はホームにリダイレクト
   useEffect(() => {
@@ -28,10 +29,20 @@ const GameOverPage: React.FC = () => {
       setIsLoadingRanking(true);
       const scores = await fetchTopScores(10);
       setRanking(scores);
+      // 10位以内に入っているかチェック（ランキングが10未満の場合は自動的に入る）
+      if (scores.length < 10) {
+        setIsInTop10(true);
+      } else {
+        // 10位のスコアと比較
+        const tenthPlaceScore = scores[9].score;
+        setIsInTop10(score > tenthPlaceScore);
+      }
       setIsLoadingRanking(false);
     };
-    loadRanking();
-  }, []);
+    if (router.isReady) {
+      loadRanking();
+    }
+  }, [router.isReady, score]);
 
   // スコアが保存された後にランキングを再読み込み
   useEffect(() => {
@@ -39,10 +50,17 @@ const GameOverPage: React.FC = () => {
       const loadRanking = async () => {
         const scores = await fetchTopScores(10);
         setRanking(scores);
+        // 10位以内に入っているか再チェック
+        if (scores.length < 10) {
+          setIsInTop10(true);
+        } else {
+          const tenthPlaceScore = scores[9].score;
+          setIsInTop10(score > tenthPlaceScore);
+        }
       };
       loadRanking();
     }
-  }, [isSubmitted]);
+  }, [isSubmitted, score]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +92,7 @@ const GameOverPage: React.FC = () => {
           </div>
         </div>
 
-        {!isSubmitted && score > 0 && (
+        {!isSubmitted && score > 0 && isInTop10 && !isLoadingRanking && (
           <form onSubmit={handleSubmit} className="space-y-4 pt-4">
             <div className="flex flex-col items-center space-y-8">
               <input
@@ -110,7 +128,12 @@ const GameOverPage: React.FC = () => {
           </div>
         )}
 
-        {!isSubmitted && score > 0 && (
+        {!isSubmitted && score > 0 && (!isInTop10 || isLoadingRanking) && (
+          <div>
+            <Button buttonText="Try Again" onClick={handleRestart} />
+          </div>
+        )}
+        {!isSubmitted && score > 0 && isInTop10 && !isLoadingRanking && (
           <div>
             <Button buttonText="Skip" onClick={handleRestart} />
           </div>
