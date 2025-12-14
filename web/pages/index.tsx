@@ -126,8 +126,11 @@ const Home: React.FC = () => {
           const newHighScore = score;
           localStorage.setItem(HIGH_SCORE_KEY, newHighScore.toString());
         }
-        // ゲームオーバーページに遷移
-        router.push(`/gameover?score=${score}`);
+        // スコアをlocalStorageに保存してからゲームオーバーページに遷移
+        if (typeof window !== "undefined") {
+          localStorage.setItem("lrchecker_game_score", score.toString());
+        }
+        router.push("/gameover");
       }
     }
   };

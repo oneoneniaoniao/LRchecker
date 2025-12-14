@@ -4,11 +4,11 @@ import Button from "@/components/ui/button/Button";
 import Ranking, { RankingScore } from "@/components/Ranking";
 import { saveScore, fetchTopScores } from "@/services/api";
 
+const GAME_SCORE_KEY = "lrchecker_game_score";
+
 const GameOverPage: React.FC = () => {
   const router = useRouter();
-  const { score: scoreParam } = router.query;
-  const score = scoreParam ? parseInt(scoreParam as string, 10) : 0;
-
+  const [score, setScore] = useState<number | null>(null);
   const [playerName, setPlayerName] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,16 +16,30 @@ const GameOverPage: React.FC = () => {
   const [isLoadingRanking, setIsLoadingRanking] = useState(true);
   const [isInTop10, setIsInTop10] = useState(false);
 
-  // スコアが無効な場合はホームにリダイレクト
+  // localStorageからスコアを取得
   useEffect(() => {
-    if (router.isReady && (!scoreParam || isNaN(score) || score < 0)) {
-      router.push("/");
+    if (typeof window !== "undefined") {
+      const savedScore = localStorage.getItem(GAME_SCORE_KEY);
+      if (savedScore) {
+        const parsedScore = parseInt(savedScore, 10);
+        if (!isNaN(parsedScore) && parsedScore >= 0) {
+          setScore(parsedScore);
+          // スコアを取得したらlocalStorageから削除
+          localStorage.removeItem(GAME_SCORE_KEY);
+        } else {
+          router.push("/");
+        }
+      } else {
+        // スコアが存在しない場合はホームにリダイレクト
+        router.push("/");
+      }
     }
-  }, [router, scoreParam, score]);
+  }, [router]);
 
   // ランキングを読み込む
   useEffect(() => {
     const loadRanking = async () => {
+      if (score === null) return;
       setIsLoadingRanking(true);
       const scores = await fetchTopScores(10);
       setRanking(scores);
@@ -39,14 +53,14 @@ const GameOverPage: React.FC = () => {
       }
       setIsLoadingRanking(false);
     };
-    if (router.isReady) {
+    if (score !== null) {
       loadRanking();
     }
-  }, [router.isReady, score]);
+  }, [score]);
 
   // スコアが保存された後にランキングを再読み込み
   useEffect(() => {
-    if (isSubmitted) {
+    if (isSubmitted && score !== null) {
       const loadRanking = async () => {
         const scores = await fetchTopScores(10);
         setRanking(scores);
@@ -64,7 +78,7 @@ const GameOverPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!playerName.trim()) return;
+    if (!playerName.trim() || score === null) return;
 
     setIsSubmitting(true);
     const saved = await saveScore(playerName.trim(), score);
@@ -78,6 +92,11 @@ const GameOverPage: React.FC = () => {
   const handleRestart = () => {
     router.push("/");
   };
+
+  // スコアが読み込まれるまで表示しない
+  if (score === null) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-6xl mx-auto space-y-8 py-8 min-h-screen px-4">
