@@ -25,7 +25,7 @@ const Ranking: React.FC<RankingProps> = ({ scores }) => {
       <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
         🏆 Top 10
       </h2>
-      <div className="space-y-0 bg-white rounded-xl shadow-md p-6">
+      <div className="space-y-0 bg-white rounded-xl shadow-md p-6 max-[520px]:bg-transparent max-[520px]:shadow-none max-[520px]:p-2 max-[520px]:rounded-none">
         {scores.map((score, index) => {
           const getRankClass = () => {
             if (index === 0) return "medal-gold";
@@ -38,9 +38,9 @@ const Ranking: React.FC<RankingProps> = ({ scores }) => {
 
           return (
             <div key={score.id}>
-              <div className="flex items-center justify-between py-4">
+              <div className="flex items-center justify-between py-4 max-[520px]:py-3">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 flex justify-center">
+                  <div className="w-12 flex justify-center max-[520px]:w-8">
                     {isTopThree ? (
                       <div className={getRankClass()}>{index + 1}</div>
                     ) : (
@@ -49,7 +49,7 @@ const Ranking: React.FC<RankingProps> = ({ scores }) => {
                       </div>
                     )}
                   </div>
-                  <div className="text-lg font-semibold text-gray-800">
+                  <div className="text-lg font-semibold text-gray-800 max-[520px]:text-base">
                     {score.playerName}
                   </div>
                 </div>
@@ -58,7 +58,7 @@ const Ranking: React.FC<RankingProps> = ({ scores }) => {
                 </div>
               </div>
               {index < scores.length - 1 && (
-                <div className="border-b border-gray-200"></div>
+                <div className="border-b border-gray-200 max-[520px]:border-gray-300"></div>
               )}
             </div>
           );
