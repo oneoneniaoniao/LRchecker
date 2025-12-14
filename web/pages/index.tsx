@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import ButtonAudio from "@/components/ui/button/ButtonAudio";
 import Button from "@/components/ui/button/Button";
+import LoadingButton from "@/components/ui/button/LoadingButton";
 import GameInfo from "@/components/GameInfo";
 import { fetchRandomWord, WordDTO } from "@/services/api";
 import { INITIAL_LIVES } from "@/config/gameConfig";
@@ -20,8 +21,10 @@ const Home: React.FC = () => {
   const [lives, setLives] = useState(INITIAL_LIVES);
   const [highScore, setHighScore] = useState(0);
   const [audioResetTrigger, setAudioResetTrigger] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   const loadNewQuestion = async () => {
+    setIsLoading(true);
     const question = await fetchRandomWord();
     if (question) {
       setCurrentQuestion(question);
@@ -36,6 +39,7 @@ const Home: React.FC = () => {
         }
       }
     }
+    setIsLoading(false);
   };
 
   // ハイスコアをlocalStorageから読み込む
@@ -142,20 +146,27 @@ const Home: React.FC = () => {
         </div>
 
         <div className="w-full space-y-4">
-          {currentQuestion && (
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button
-                buttonText={currentQuestion.words[0]}
-                onClick={() => handleWordClick(0)}
-                disabled={isAnswered}
-              />
-              <Button
-                buttonText={currentQuestion.words[1]}
-                onClick={() => handleWordClick(1)}
-                disabled={isAnswered}
-              />
-            </div>
-          )}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center min-h-[80px]">
+            {isLoading ? (
+              <>
+                <LoadingButton />
+                <LoadingButton />
+              </>
+            ) : currentQuestion ? (
+              <>
+                <Button
+                  buttonText={currentQuestion.words[0]}
+                  onClick={() => handleWordClick(0)}
+                  disabled={isAnswered}
+                />
+                <Button
+                  buttonText={currentQuestion.words[1]}
+                  onClick={() => handleWordClick(1)}
+                  disabled={isAnswered}
+                />
+              </>
+            ) : null}
+          </div>
         </div>
 
         {result && (
