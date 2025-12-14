@@ -1,13 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { INITIAL_LIVES } from "@/config/gameConfig";
+
+const HIGH_SCORE_KEY = "lrchecker_high_score";
 
 type GameInfoProps = {
   score: number;
   lives: number;
-  highScore: number;
 };
 
-const GameInfo: React.FC<GameInfoProps> = ({ score, lives, highScore }) => {
+const GameInfo: React.FC<GameInfoProps> = ({ score, lives }) => {
+  const [highScore, setHighScore] = useState<number>(0);
+
+  // localStorageから直接ハイスコアを読み込む
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(HIGH_SCORE_KEY);
+      const score = saved ? parseInt(saved, 10) : 0;
+      setHighScore(score);
+    }
+  }, []);
+
   // ライフ数の配列を生成（1からINITIAL_LIVESまで）
   const lifeArray = Array.from({ length: INITIAL_LIVES }, (_, i) => i + 1);
 

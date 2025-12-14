@@ -6,20 +6,26 @@ import LoadingButton from "@/components/ui/button/LoadingButton";
 import GameInfo from "@/components/GameInfo";
 import { fetchRandomWord, WordDTO } from "@/services/api";
 import { INITIAL_LIVES } from "@/config/gameConfig";
+import { useGameStore } from "@/store/gameStore";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
-const HIGH_SCORE_KEY = "lrchecker_high_score";
-
 const Home: React.FC = () => {
   const router = useRouter();
+  const {
+    highScore,
+    setHighScore,
+    setCurrentScore,
+    setIsNewRecord,
+    resetGameState,
+    initializeHighScore,
+  } = useGameStore();
   const [currentQuestion, setCurrentQuestion] = useState<WordDTO | null>(null);
   const [currentAudio, setCurrentAudio] = useState("");
   const [result, setResult] = useState("");
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(INITIAL_LIVES);
-  const [highScore, setHighScore] = useState(0);
   const [audioResetTrigger, setAudioResetTrigger] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -42,15 +48,11 @@ const Home: React.FC = () => {
     setIsLoading(false);
   };
 
-  // ハイスコアをlocalStorageから読み込む
+  // クライアントサイドでのみハイスコアを初期化
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const savedHighScore = localStorage.getItem(HIGH_SCORE_KEY);
-      if (savedHighScore) {
-        setHighScore(parseInt(savedHighScore, 10));
-      }
-    }
-  }, []);
+    initializeHighScore();
+    resetGameState();
+  }, [initializeHighScore, resetGameState]);
 
   useEffect(() => {
     loadNewQuestion();
@@ -95,12 +97,11 @@ const Home: React.FC = () => {
 
   // ハイスコアを更新
   useEffect(() => {
-    if (typeof window !== "undefined" && score > highScore) {
-      const newHighScore = score;
-      setHighScore(newHighScore);
-      localStorage.setItem(HIGH_SCORE_KEY, newHighScore.toString());
+    if (score > highScore) {
+      setHighScore(score);
+      setIsNewRecord(true);
     }
-  }, [score, highScore]);
+  }, [score, highScore, setHighScore, setIsNewRecord]);
 
   const handleWordClick = (wordIndex: number) => {
     if (isAnswered || !currentQuestion) return;
@@ -121,15 +122,8 @@ const Home: React.FC = () => {
       const newLives = lives - 1;
       setLives(newLives);
       if (newLives <= 0) {
-        // ゲームオーバー時にハイスコアを更新してから遷移
-        if (typeof window !== "undefined" && score > highScore) {
-          const newHighScore = score;
-          localStorage.setItem(HIGH_SCORE_KEY, newHighScore.toString());
-        }
-        // スコアをlocalStorageに保存してからゲームオーバーページに遷移
-        if (typeof window !== "undefined") {
-          localStorage.setItem("lrchecker_game_score", score.toString());
-        }
+        // ゲームオーバー時にスコアをストアに保存してから遷移
+        setCurrentScore(score);
         router.push("/gameover");
       }
     }
@@ -137,7 +131,7 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <GameInfo score={score} lives={lives} highScore={highScore} />
+      <GameInfo score={score} lives={lives} />
       <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto space-y-16 py-4">
         <div className="flex justify-center -mt-8">
           <ButtonAudio
