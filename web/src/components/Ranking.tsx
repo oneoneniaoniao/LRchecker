@@ -25,33 +25,44 @@ const Ranking: React.FC<RankingProps> = ({ scores }) => {
       <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
         🏆 Top 10
       </h2>
-      <div className="space-y-2">
-        {scores.map((score, index) => (
-          <div
-            key={score.id}
-            className="flex items-center justify-between bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
-          >
-            <div className="flex items-center space-x-4">
-              <div
-                className={`text-2xl font-bold ${
-                  index === 0
-                    ? "text-yellow-500"
-                    : index === 1
-                      ? "text-gray-400"
-                      : index === 2
-                        ? "text-amber-600"
-                        : "text-gray-400"
-                }`}
-              >
-                #{index + 1}
+      <div className="space-y-0 bg-white rounded-xl shadow-md p-6">
+        {scores.map((score, index) => {
+          const getRankClass = () => {
+            if (index === 0) return "medal-gold";
+            if (index === 1) return "medal-silver";
+            if (index === 2) return "medal-bronze";
+            return "";
+          };
+
+          const isTopThree = index < 3;
+
+          return (
+            <div key={score.id}>
+              <div className="flex items-center justify-between py-4">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 flex justify-center">
+                    {isTopThree ? (
+                      <div className={getRankClass()}>{index + 1}</div>
+                    ) : (
+                      <div className="text-2xl font-bold text-gray-400">
+                        {index + 1}
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-lg font-semibold text-gray-800">
+                    {score.playerName}
+                  </div>
+                </div>
+                <div className="text-xl font-bold text-blue-600">
+                  {score.score}
+                </div>
               </div>
-              <div className="text-lg font-semibold text-gray-800">
-                {score.playerName}
-              </div>
+              {index < scores.length - 1 && (
+                <div className="border-b border-gray-200"></div>
+              )}
             </div>
-            <div className="text-xl font-bold text-blue-600">{score.score}</div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

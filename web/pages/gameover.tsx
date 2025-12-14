@@ -99,8 +99,8 @@ const GameOverPage: React.FC = () => {
                 type="text"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
-                placeholder="Enter your name (max 20 characters)"
-                maxLength={20}
+                placeholder="Enter your name (max 16 characters)"
+                maxLength={16}
                 className="px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 w-full max-w-md"
                 disabled={isSubmitting}
               />

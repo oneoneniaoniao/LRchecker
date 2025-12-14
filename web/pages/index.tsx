@@ -135,7 +135,7 @@ const Home: React.FC = () => {
   return (
     <>
       <GameInfo score={score} lives={lives} highScore={highScore} />
-      <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto space-y-12 py-4">
+      <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto space-y-16 py-4">
         <div className="flex justify-center -mt-8">
           <ButtonAudio
             audioSrc={currentAudio}
